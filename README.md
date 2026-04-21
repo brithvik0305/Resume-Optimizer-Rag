@@ -25,8 +25,8 @@ The RAG context is built once per request and reused across both providers, whic
 ### 1. Clone and set up the environment
 
 ```bash
-git clone https://github.com/your-username/resume-enhancer-rag.git
-cd resume-enhancer-rag
+git clone https://github.com/brithvik0305/Resume-Optimizer-Rag.git
+cd Resume-Optimizer-Rag
 
 python -m venv venv
 source venv/bin/activate        # on Windows: venv\Scripts\activate
