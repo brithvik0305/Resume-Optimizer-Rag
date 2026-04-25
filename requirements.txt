@@ -1,0 +1,16 @@
+# ─── Django ────────────────────────────────────────────────
+Django
+python-dotenv
+
+# ─── HTTP / API calls ──────────────────────────────────────
+requests
+
+# ─── Data handling ─────────────────────────────────────────
+numpy
+pandas
+scikit-learn
+
+# ─── RAG: embeddings + reranking ───────────────────────────
+sentence-transformers
+torch
+transformers

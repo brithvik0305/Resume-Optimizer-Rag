@@ -6,6 +6,7 @@ import json
 import requests
 import numpy as np
 import pandas as pd
+from sentence_transformers import SentenceTransformer, CrossEncoder
 from sklearn.metrics.pairwise import cosine_similarity
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -74,8 +75,7 @@ def parse_versions(raw: str) -> dict:
 
 
 def _load_rag_components():
-    from sentence_transformers import SentenceTransformer, CrossEncoder
-
+    
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     dataset_path = os.path.join(BASE_DIR, "job_dataset.csv")
 
