@@ -10,7 +10,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 from django.shortcuts import render, redirect
 from django.conf import settings
 
-# ── API config ────────────────────────────────────────────────────────────────
 GEMINI_API_KEY = settings.GEMINI_API_KEY
 GEMINI_URL = (
     "https://generativelanguage.googleapis.com/v1beta/"
@@ -19,8 +18,7 @@ GEMINI_URL = (
 
 GROQ_API_KEY = settings.GROQ_API_KEY
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.3-70b-versatile"  # swap to any model available on your Groq account
-
+GROQ_MODEL = "llama-3.3-70b-versatile"  
 
 def call_gemini(prompt: str) -> str:
     response = requests.post(
@@ -75,7 +73,6 @@ def parse_versions(raw: str) -> dict:
         }
 
 
-# ── RAG components (loaded once at startup) ───────────────────────────────────
 def _load_rag_components():
     from sentence_transformers import SentenceTransformer, CrossEncoder
 
@@ -112,8 +109,6 @@ except Exception as _e:
     traceback.print_exc()
 
 
-# ── Pipeline steps ────────────────────────────────────────────────────────────
-
 def reformulate_query(job_description: str) -> str:
     prompt = (
         "You are a technical recruiter. Distill the following job description "
@@ -122,8 +117,6 @@ def reformulate_query(job_description: str) -> str:
         "Return ONLY the query as a single line of comma-separated terms. No explanation.\n\n"
         f"Job Description:\n{job_description[:1000]}"
     )
-    # Query reformulation stays on Gemini — it's part of the retrieval pipeline,
-    # not the generation step being compared.
     return call_gemini(prompt)
 
 
@@ -226,8 +219,6 @@ TASK:
 {JSON_INSTRUCTION}"""
 
 
-# ── Helpers to run a provider cleanly ─────────────────────────────────────────
-
 EMPTY_VERSIONS = {"version_1": "", "version_2": "", "version_3": ""}
 RAG_UNAVAILABLE = {
     "version_1": "RAG components not available.",
@@ -248,7 +239,6 @@ def _safe_call(caller, prompt, label):
         }
 
 
-# ── Similarity scoring ────────────────────────────────────────────────────────
 
 def _empty_scored(text: str) -> dict:
     """Build the scored-dict shape used by the template when scoring is skipped."""
@@ -270,11 +260,9 @@ def score_versions(versions: dict, jd_embedding) -> dict:
     keys  = ["version_1", "version_2", "version_3"]
     texts = [(versions.get(k) or "").strip() for k in keys]
 
-    # If RAG never loaded, we have no embedding model — return empty shape
     if jd_embedding is None or not RAG_READY:
         return {k: _empty_scored(versions.get(k, "")) for k in keys}
 
-    # Batch-encode only non-empty versions
     non_empty_idx = [i for i, t in enumerate(texts) if t]
     scores = [None] * len(keys)
 
@@ -303,7 +291,6 @@ def score_versions(versions: dict, jd_embedding) -> dict:
     return out
 
 
-# ── Django views ──────────────────────────────────────────────────────────────
 
 def home(request):
     if request.method == "POST":
@@ -315,7 +302,6 @@ def home(request):
                 "error": "Please fill in both fields."
             })
 
-        # Build prompts once, reuse across providers
         rag_prompt = None
         if RAG_READY:
             try:
@@ -327,15 +313,12 @@ def home(request):
 
         normal_prompt = build_normal_prompt(bullet_points, job_description)
 
-        # Gemini
         gemini_rag    = _safe_call(call_gemini, rag_prompt, "Gemini") if rag_prompt else RAG_UNAVAILABLE
         gemini_normal = _safe_call(call_gemini, normal_prompt, "Gemini")
 
-        # Groq
         groq_rag      = _safe_call(call_groq, rag_prompt, "Groq") if rag_prompt else RAG_UNAVAILABLE
         groq_normal   = _safe_call(call_groq, normal_prompt, "Groq")
 
-        # Embed the JD once, score every version against it
         jd_emb = None
         if RAG_READY:
             try:
