@@ -28,7 +28,12 @@ GROQ_API_KEY   = os.environ.get("GROQ_API_KEY", "")
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(6@(e-oiane4i3po+9t$!)tv0_iw$h0za11h^)f+w5(8a%m6m5'
+# The hardcoded fallback below is for local development only — set
+# DJANGO_SECRET_KEY in the environment (or .env) for anything else.
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    'django-insecure-(6@(e-oiane4i3po+9t$!)tv0_iw$h0za11h^)f+w5(8a%m6m5',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

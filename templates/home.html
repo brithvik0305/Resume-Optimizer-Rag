@@ -153,12 +153,17 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label">Job Description</label>
+                        <label class="form-label" for="jd-input">Job Description</label>
                         <textarea class="form-control" rows="6" name="job_description"
+                            id="jd-input" maxlength="1200"
                             placeholder="Paste target job description here..."></textarea>
+                        <div class="form-text d-flex justify-content-between">
+                            <span>Limited to 1,200 characters — the same slice is used for retrieval, prompts, and scoring.</span>
+                            <span><span id="jd-count">0</span>/1200</span>
+                        </div>
                     </div>
                     {% if error %}
-                    <div class="alert alert-danger border-radius: 14px;" role="alert">
+                    <div class="alert alert-danger" style="border-radius: 14px;" role="alert">
                         {{ error }}
                     </div>
                     {% endif %}
@@ -177,6 +182,12 @@
 
     </div>
 </div>
+
+<script>
+    const jdInput = document.getElementById('jd-input');
+    const jdCount = document.getElementById('jd-count');
+    jdInput.addEventListener('input', () => { jdCount.textContent = jdInput.value.length; });
+</script>
 
 </body>
 </html>

@@ -1,0 +1,19 @@
+{# One enhanced version: text, optional faithfulness badge, alignment bar. #}
+<div class="version-card">
+    <div class="version-header">{{ label }}</div>
+    <div class="version-body">{{ version.text }}</div>
+    {% if version.added_terms %}
+    <div class="faith-badge"
+         title="Skills/tools in this version that do not appear in your original bullet — verify them before using it.">
+        &#9888; adds: {{ version.added_terms|join:", " }}
+    </div>
+    {% endif %}
+    <div class="sim-footer">
+        <span class="sim-label">JD Keyword Alignment</span>
+        <div class="sim-bar-wrap">
+            <div class="sim-bar {% if version.score_pct < 50 %}low{% elif version.score_pct < 75 %}mid{% else %}high{% endif %}"
+                 style="width: {{ version.score_pct }}%"></div>
+        </div>
+        <span class="sim-score">{{ version.score_display }}</span>
+    </div>
+</div>

@@ -105,6 +105,37 @@
             flex: 1;
         }
 
+        /* Faithfulness badge — skills added vs. the original bullet */
+        .faith-badge {
+            background: #fffbeb;
+            border-top: 1px solid #fde68a;
+            color: #92400e;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+        }
+
+        /* Failed provider cell */
+        .error-card {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 16px;
+            padding: 18px;
+            color: #991b1b;
+            font-size: 14px;
+        }
+
+        .error-card .error-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .error-card .error-note {
+            margin-top: 8px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
         /* Similarity footer */
         .sim-footer {
             background: #f8fafc;
@@ -138,7 +169,7 @@
             transition: width 0.4s ease;
         }
 
-        /* Color variants for score bar based on quality */
+        /* Color variants for score bar based on alignment */
         .sim-bar.low  { background: linear-gradient(90deg, #f87171, #ef4444); }
         .sim-bar.mid  { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
         .sim-bar.high { background: linear-gradient(90deg, #14b8a6, #0d9488); }
@@ -180,7 +211,12 @@
     <!-- Header -->
     <div class="top-card text-center">
         <h1>Resume Enhancement Results</h1>
-        <p>Compare Gemini vs Groq, each with and without the RAG pipeline. Bars show cosine similarity of each version against your JD.</p>
+        <p>
+            Compare Gemini vs Groq, each with and without the RAG pipeline.
+            Bars show <strong>JD Keyword Alignment</strong> — cosine similarity between each version
+            and the target JD. High alignment means JD-matching vocabulary, not overall quality.
+            The &#9888; badge flags skills a version adds that were not in your original bullet.
+        </p>
     </div>
 
     <!-- ── GEMINI SECTION ─────────────────────────────────────────────── -->
@@ -191,99 +227,12 @@
         </div>
 
         <div class="row g-4">
-
-            <!-- Gemini + RAG -->
             <div class="col-md-6">
-                <div class="col-header col-header-rag mb-3">
-                    With RAG &nbsp;<small style="font-weight:400;font-size:12px;">JD → Retrieve → Re-rank → Generate</small>
-                </div>
-                <div class="section-label">3 Enhanced Versions</div>
-                <div class="d-flex flex-column gap-3">
-                    <div class="version-card">
-                        <div class="version-header">Version 1 — Keyword Optimized</div>
-                        <div class="version-body">{{ gemini_rag.version_1.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if gemini_rag.version_1.score_pct < 50 %}low{% elif gemini_rag.version_1.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ gemini_rag.version_1.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ gemini_rag.version_1.score_display }}</span>
-                        </div>
-                    </div>
-                    <div class="version-card">
-                        <div class="version-header">Version 2 — Achievement Focused</div>
-                        <div class="version-body">{{ gemini_rag.version_2.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if gemini_rag.version_2.score_pct < 50 %}low{% elif gemini_rag.version_2.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ gemini_rag.version_2.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ gemini_rag.version_2.score_display }}</span>
-                        </div>
-                    </div>
-                    <div class="version-card">
-                        <div class="version-header">Version 3 — Balanced</div>
-                        <div class="version-body">{{ gemini_rag.version_3.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if gemini_rag.version_3.score_pct < 50 %}low{% elif gemini_rag.version_3.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ gemini_rag.version_3.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ gemini_rag.version_3.score_display }}</span>
-                        </div>
-                    </div>
-                </div>
+                {% include "_result_column.html" with result=gemini_rag header_class="col-header-rag" header_label="With RAG" header_sub="JD → Retrieve → Re-rank → Generate" %}
             </div>
-
-            <!-- Gemini + Baseline -->
             <div class="col-md-6">
-                <div class="col-header col-header-normal mb-3">
-                    Without RAG &nbsp;<small style="font-weight:400;font-size:12px;">Direct LLM Response</small>
-                </div>
-                <div class="section-label">3 Enhanced Versions</div>
-                <div class="d-flex flex-column gap-3">
-                    <div class="version-card">
-                        <div class="version-header">Version 1 — Keyword Optimized</div>
-                        <div class="version-body">{{ gemini_normal.version_1.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if gemini_normal.version_1.score_pct < 50 %}low{% elif gemini_normal.version_1.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ gemini_normal.version_1.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ gemini_normal.version_1.score_display }}</span>
-                        </div>
-                    </div>
-                    <div class="version-card">
-                        <div class="version-header">Version 2 — Achievement Focused</div>
-                        <div class="version-body">{{ gemini_normal.version_2.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if gemini_normal.version_2.score_pct < 50 %}low{% elif gemini_normal.version_2.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ gemini_normal.version_2.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ gemini_normal.version_2.score_display }}</span>
-                        </div>
-                    </div>
-                    <div class="version-card">
-                        <div class="version-header">Version 3 — Balanced</div>
-                        <div class="version-body">{{ gemini_normal.version_3.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if gemini_normal.version_3.score_pct < 50 %}low{% elif gemini_normal.version_3.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ gemini_normal.version_3.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ gemini_normal.version_3.score_display }}</span>
-                        </div>
-                    </div>
-                </div>
+                {% include "_result_column.html" with result=gemini_normal header_class="col-header-normal" header_label="Without RAG" header_sub="Direct LLM Response" %}
             </div>
-
         </div>
     </div>
 
@@ -295,99 +244,12 @@
         </div>
 
         <div class="row g-4">
-
-            <!-- Groq + RAG -->
             <div class="col-md-6">
-                <div class="col-header col-header-rag mb-3">
-                    With RAG &nbsp;<small style="font-weight:400;font-size:12px;">JD → Retrieve → Re-rank → Generate</small>
-                </div>
-                <div class="section-label">3 Enhanced Versions</div>
-                <div class="d-flex flex-column gap-3">
-                    <div class="version-card">
-                        <div class="version-header">Version 1 — Keyword Optimized</div>
-                        <div class="version-body">{{ groq_rag.version_1.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if groq_rag.version_1.score_pct < 50 %}low{% elif groq_rag.version_1.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ groq_rag.version_1.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ groq_rag.version_1.score_display }}</span>
-                        </div>
-                    </div>
-                    <div class="version-card">
-                        <div class="version-header">Version 2 — Achievement Focused</div>
-                        <div class="version-body">{{ groq_rag.version_2.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if groq_rag.version_2.score_pct < 50 %}low{% elif groq_rag.version_2.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ groq_rag.version_2.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ groq_rag.version_2.score_display }}</span>
-                        </div>
-                    </div>
-                    <div class="version-card">
-                        <div class="version-header">Version 3 — Balanced</div>
-                        <div class="version-body">{{ groq_rag.version_3.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if groq_rag.version_3.score_pct < 50 %}low{% elif groq_rag.version_3.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ groq_rag.version_3.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ groq_rag.version_3.score_display }}</span>
-                        </div>
-                    </div>
-                </div>
+                {% include "_result_column.html" with result=groq_rag header_class="col-header-rag" header_label="With RAG" header_sub="JD → Retrieve → Re-rank → Generate" %}
             </div>
-
-            <!-- Groq + Baseline -->
             <div class="col-md-6">
-                <div class="col-header col-header-normal mb-3">
-                    Without RAG &nbsp;<small style="font-weight:400;font-size:12px;">Direct LLM Response</small>
-                </div>
-                <div class="section-label">3 Enhanced Versions</div>
-                <div class="d-flex flex-column gap-3">
-                    <div class="version-card">
-                        <div class="version-header">Version 1 — Keyword Optimized</div>
-                        <div class="version-body">{{ groq_normal.version_1.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if groq_normal.version_1.score_pct < 50 %}low{% elif groq_normal.version_1.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ groq_normal.version_1.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ groq_normal.version_1.score_display }}</span>
-                        </div>
-                    </div>
-                    <div class="version-card">
-                        <div class="version-header">Version 2 — Achievement Focused</div>
-                        <div class="version-body">{{ groq_normal.version_2.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if groq_normal.version_2.score_pct < 50 %}low{% elif groq_normal.version_2.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ groq_normal.version_2.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ groq_normal.version_2.score_display }}</span>
-                        </div>
-                    </div>
-                    <div class="version-card">
-                        <div class="version-header">Version 3 — Balanced</div>
-                        <div class="version-body">{{ groq_normal.version_3.text }}</div>
-                        <div class="sim-footer">
-                            <span class="sim-label">JD Similarity</span>
-                            <div class="sim-bar-wrap">
-                                <div class="sim-bar {% if groq_normal.version_3.score_pct < 50 %}low{% elif groq_normal.version_3.score_pct < 75 %}mid{% else %}high{% endif %}"
-                                     style="width: {{ groq_normal.version_3.score_pct }}%"></div>
-                            </div>
-                            <span class="sim-score">{{ groq_normal.version_3.score_display }}</span>
-                        </div>
-                    </div>
-                </div>
+                {% include "_result_column.html" with result=groq_normal header_class="col-header-normal" header_label="Without RAG" header_sub="Direct LLM Response" %}
             </div>
-
         </div>
     </div>
 

@@ -1,0 +1,18 @@
+{# One provider × pipeline column: an explicit error state, or three scored version cards. #}
+<div class="col-header {{ header_class }} mb-3">
+    {{ header_label }} &nbsp;<small style="font-weight:400;font-size:12px;">{{ header_sub }}</small>
+</div>
+{% if result.status != "ok" %}
+<div class="error-card">
+    <div class="error-title">Generation failed</div>
+    <div class="error-body">{{ result.error }}</div>
+    <div class="error-note">This cell is excluded from scoring.</div>
+</div>
+{% else %}
+<div class="section-label">3 Enhanced Versions</div>
+<div class="d-flex flex-column gap-3">
+    {% include "_version_card.html" with version=result.version_1 label="Version 1 — Keyword Optimized" %}
+    {% include "_version_card.html" with version=result.version_2 label="Version 2 — Achievement Focused" %}
+    {% include "_version_card.html" with version=result.version_3 label="Version 3 — Balanced" %}
+</div>
+{% endif %}
